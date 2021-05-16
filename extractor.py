@@ -5,7 +5,7 @@ import math
 from typing import Any, List
 
 
-def pre_process_image(image: np.ndarray):
+def pre_process_image(image: np.ndarray) -> np.ndarray:
 	'''
 	Appllies Gaussian blur, thresholding and colour inversion to an image.
 	'''
@@ -23,7 +23,7 @@ def pre_process_image(image: np.ndarray):
 	return image
 
 
-def find_corners(image: np.ndarray):
+def find_corners(image: np.ndarray) -> np.ndarray:
 	'''
 	Find the 4 corners of the square grid.
 	'''
@@ -51,9 +51,9 @@ def get_distance(pt1: Any, pt2: Any):
 	return math.sqrt(side_1**2 + side_2**2)
 
 
-def wrap_image(image: np.ndarray, corners: List):
+def wrap_crop_image(image: np.ndarray, corners: List) -> np.ndarray:
 	'''
-	Wrap the image to create a birds eye of the puzzle and cut out any space around the grid.
+	Wrap and crop the image to create a birds eye of the puzzle and cut out any space around the grid.
 	'''
 	top_left, top_right, bottom_left, bottom_right = corners[0], corners[1], corners[2], corners[3]
 
@@ -70,6 +70,31 @@ def wrap_image(image: np.ndarray, corners: List):
 	rect = np.array([[0, 0], [max_side - 1, 0], [max_side - 1, max_side - 1], [0, max_side - 1]], dtype='float32')
 
 	m = cv2.getPerspectiveTransform(src,rect)
-
 	return cv2.warpPerspective(image, m, (int(max_side), int(max_side)))
+
+
+def create_grid(image: np.ndarray) -> List:
+	'''
+	Find the coordinates of all 81 cells that make up the grid.
+	
+	Method:
+	pt1------|
+	|		 |
+	|		 |
+	|-------pt2
+
+	'''
+	one_side = image.shape[0]
+	cell = one_side/9
+	output = []
+
+	for x in range(9):
+		for y in range(9):
+			pt1 = [x*cell,y*cell]
+			pt2 = [(x+1)*cell,(y+1)*cell]
+			output.append([pt1,pt2])
+	return output
+
+
+
 

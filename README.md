@@ -4,6 +4,8 @@
 
 This program extracts, proceses and solves Sudoku images taken from local newspapers in London. Here we use a colectiong of image preprocese before applying a training convolutional neural network (CNN) to extract the digits from the individual cells. The CNN was training on the MNIST dataset on handwritten digits.
 
+![Example](https://github.com/deanhoperobertson/Sudoku-Solver/blob/main/Images/Easy.jpg?raw=true)
+
 ## How to Run
 ```    
 python sudoku.py
