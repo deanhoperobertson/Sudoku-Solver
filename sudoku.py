@@ -2,7 +2,7 @@
 import os
 import cv2
 from extractor import pre_process_image, find_corners, wrap_crop_image, create_grid
-from fnn import print_dataset_info
+from cnn import print_dataset_info
 
 SCALE =2
 PATH = os.getcwd()+"/Images/Easy.jpg"
