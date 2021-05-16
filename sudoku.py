@@ -1,7 +1,7 @@
 #main file from which the seervice will be executed
 import os
 import cv2
-from extractor import pre_process_image, find_corners
+from extractor import pre_process_image, find_corners, draw_rectangle
 
 SCALE =2
 PATH = os.getcwd()+"/Images/Easy.jpg"
@@ -14,6 +14,8 @@ def main():
 	image = pre_process_image(image)
 
 	corners = find_corners(image)
+
+	image = draw_rectangle(image,corners)
 
 	image = cv2.resize(image, (222*SCALE, 225*SCALE)) 
 	cv2.imshow("Window", image)
