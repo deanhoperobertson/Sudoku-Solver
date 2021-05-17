@@ -8,6 +8,7 @@ This program extracts, proceses and solves Sudoku images taken from local newspa
 
 ## How to Run
 ```    
+python cnn.py (to train model)
 python sudoku.py
 ```
 

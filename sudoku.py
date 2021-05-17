@@ -2,7 +2,6 @@
 import os
 import cv2
 from extractor import pre_process_image, find_corners, wrap_crop_image, create_grid
-from cnn import print_dataset_info
 
 SCALE =2
 PATH = os.getcwd()+"/Images/Easy.jpg"
@@ -26,5 +25,4 @@ def main():
 	cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-	print_dataset_info()
 	main()

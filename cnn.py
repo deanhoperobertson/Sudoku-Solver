@@ -8,31 +8,30 @@ from keras.utils import np_utils
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.layers import Dense, Dropout, Flatten
 
+from sklearn.metrics import confusion_matrix
+import pandas as pd
+import numpy as np
+
 
 EPOCHS = 5
 BATCH = 500
 
 #load MNIST dataset from keras
-(X_train, y_train), (X_test, y_test) = mnist.load_data()
+(X_train, Y_train), (X_test, Y_test) = mnist.load_data()
 
 #cast type
 X_train = X_train.reshape(X_train.shape[0], 1,28, 28).astype('float32')
 X_test = X_test.reshape(X_test.shape[0], 1, 28, 28).astype('float32')
-y_train = y_train.astype('int32')
-y_test = y_test.astype('int32')
+Y_train = Y_train.astype('int32')
+Y_test = Y_test.astype('int32')
 
 #rescale data
 X_train = X_train/255
 X_test = X_test/255
 
 #one-hot encode the target variables
-y_train = np_utils.to_categorical(y_train)
-y_test = np_utils.to_categorical(y_test)
-
-
-def print_dataset_info():
-	print("Training input:",X_train.shape)
-	print("Training output:", y_train.shape)
+y_train = np_utils.to_categorical(Y_train)
+y_test = np_utils.to_categorical(Y_test)
 
 #Build neural network architecture
 model = Sequential()
@@ -60,7 +59,21 @@ model.fit(X_train,y_train,
 final_loss, final_acc = model.evaluate(X_test,y_test,verbose=0)
 print("Test loss: {0:.2f}, Test accuracy: {1:.2f}%".format(final_loss, final_acc*100))
 
+
+#fetch test predictions
+predictions = model.predict_classes(X_test)
+preds=predictions.tolist()
+y_lbls = Y_test.tolist()
+
+#display confusion matrix
+cm_1 = confusion_matrix(y_lbls, preds)
+print(pd.DataFrame(cm_1))
+
+
 #now to save weightings of trained model
-
-
-
+model_json = model.to_json()
+with open("models/model.json", "w") as json_file:
+    json_file.write(model_json)
+# serialize weights to HDF5
+model.save_weights("models/model.h5")
+print("Saved model to disk")
