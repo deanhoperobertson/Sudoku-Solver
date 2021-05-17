@@ -14,3 +14,5 @@ python sudoku.py
 ## Package Dependencies
 - Python 3.7
 - OpenCV
+- Tensorflow
+- Keras

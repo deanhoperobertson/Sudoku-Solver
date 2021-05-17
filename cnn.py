@@ -10,7 +10,7 @@ from keras.layers import Dense, Dropout, Flatten
 
 
 EPOCHS = 5
-BATCH = 128
+BATCH = 500
 
 #load MNIST dataset from keras
 (X_train, y_train), (X_test, y_test) = mnist.load_data()
@@ -34,7 +34,7 @@ def print_dataset_info():
 	print("Training input:",X_train.shape)
 	print("Training output:", y_train.shape)
 
-
+#Build neural network architecture
 model = Sequential()
 model.add(Conv2D(10, (5, 5), input_shape=(1, 28, 28), activation='relu', data_format='channels_first'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -43,18 +43,24 @@ model.add(Flatten())
 model.add(Dense(128, activation='relu'))
 model.add(Dense(10, activation='softmax'))
 
+#compile model
 model.compile(loss='categorical_crossentropy', 
               optimizer='adam',
               metrics=['accuracy'])
-
 print(model.summary())
 
+#fit model to training data
+model.fit(X_train,y_train,
+          validation_split=0.2,
+          verbose=1,
+          batch_size=BATCH, 
+          epochs=EPOCHS)
 
-# model.fit(X_train,y_train,
-#           validation_split=0.2,
-#           verbose=1,
-#           batch_size=BATCH, 
-#           epochs=EPOCHS)
+#evaludate performance
+final_loss, final_acc = model.evaluate(X_test,y_test,verbose=0)
+print("Test loss: {0:.2f}, Test accuracy: {1:.2f}%".format(final_loss, final_acc*100))
+
+#now to save weightings of trained model
 
 
 
