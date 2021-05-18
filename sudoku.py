@@ -2,7 +2,7 @@
 import os
 import cv2
 import numpy as np
-from extractor import (
+from preprocess import (
 	pre_process_image,
 	find_corners,
 	wrap_crop_image,
@@ -23,7 +23,7 @@ def main():
 
 	grid = create_grid(image)
 
-	image=extract_digit(image,grid[0])
+	image=extract_digit(image,grid[1])
 
 	n_white_pix = np.sum(image == 255)
 	print("Number of white pixels:", n_white_pix)
