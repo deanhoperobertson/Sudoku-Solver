@@ -96,5 +96,38 @@ def create_grid(image: np.ndarray) -> List:
     return output
 
 
+def fetch_digit(image: np.ndarray, squares: List) -> List:
+    '''
+    Extracts the digits from each cell within the image.
+
+    image (np.ndarray): procesed image
+    squares (List): list of cell coordinates
+
+    Returns: List of numbers.
+    '''
+    return [extract_digit(image,square) for square in squares]
+
+
+def cut_from_rect(img, rect):
+    '''
+    Cuts the image using the top left and bottom right points.
+    '''
+    return img[int(rect[0][1]):int(rect[1][1]), int(rect[0][0]):int(rect[1][0])]
+
+
+def extract_digit(image : np.ndarray, square: List):
+    '''
+    Extract digit from the cell. If no number then return none.
+    '''
+    image_cell = cut_from_rect(image, square)
+    return image_cell  
+
+
+
+
+
+
+
+
 
 

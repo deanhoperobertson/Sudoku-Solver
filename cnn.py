@@ -1,19 +1,16 @@
 #feed-forward neural network for MNIST Dataset
+import pandas as pd
 import tensorflow as tf
 import keras
 from keras import Sequential
-from keras.optimizers import Adam
 from keras.datasets import mnist
 from keras.utils import np_utils
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.layers import Dense, Dropout, Flatten
-
 from sklearn.metrics import confusion_matrix
-import pandas as pd
-import numpy as np
 
 
-EPOCHS = 5
+EPOCHS = 5x
 BATCH = 500
 
 #load MNIST dataset from keras

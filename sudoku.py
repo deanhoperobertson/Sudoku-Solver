@@ -1,7 +1,13 @@
 #main file from which the seervice will be executed
 import os
 import cv2
-from extractor import pre_process_image, find_corners, wrap_crop_image, create_grid
+import numpy as np
+from extractor import (
+	pre_process_image,
+	find_corners,
+	wrap_crop_image,
+	create_grid,
+	extract_digit)
 
 SCALE =2
 PATH = os.getcwd()+"/Images/Easy.jpg"
@@ -16,6 +22,11 @@ def main():
 	image = wrap_crop_image(image,corners)
 
 	grid = create_grid(image)
+
+	image=extract_digit(image,grid[0])
+
+	n_white_pix = np.sum(image == 255)
+	print("Number of white pixels:", n_white_pix)
 
 
 	image = cv2.resize(image, (222*SCALE, 225*SCALE)) 
