@@ -87,11 +87,12 @@ def create_grid(image: np.ndarray) -> List:
     one_side = image.shape[0]
     cell = one_side/9
     output = []
+    trim = 2
 
     for x in range(9):
         for y in range(9):
-            pt1 = [x*cell,y*cell]
-            pt2 = [(x+1)*cell,(y+1)*cell]
+            pt1 = [(x*cell)+trim,(y*cell)+trim]
+            pt2 = [((x+1)*cell)-trim,((y+1)*cell)-trim]
             output.append([pt1,pt2])
     return output
 
@@ -117,10 +118,16 @@ def cut_from_rect(img, rect):
 
 def extract_digit(image : np.ndarray, square: List):
     '''
-    Extract digit from the cell. If no number then return none.
+    Determine if a cell has a number.
     '''
     image_cell = cut_from_rect(image, square)
-    return image_cell  
+    n_white_pix = np.sum(image == 0)
+
+    if int(n_white_pix) > 300:
+        return "NO Number"
+    else:
+        return "Number"
+
 
 
 
