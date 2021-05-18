@@ -17,7 +17,7 @@ def pre_process_image(image: np.ndarray) -> np.ndarray:
         cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
         cv2.THRESH_BINARY,
         11,
-        2)
+        15)
 
     image = cv2.bitwise_not(image, image)
     return image

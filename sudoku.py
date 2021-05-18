@@ -23,12 +23,12 @@ def main():
 
 	grid = create_grid(image)
 
-	#image=extract_digit(image,grid[1])
+	# image=extract_digit(image,grid[3])
 	# n_white_pix = np.sum(image == 255)
 	# print("Number of white pixels:", n_white_pix)
 
 	#save image
-	cv2.imwrite('test.jpg', image)
+	#cv2.imwrite('test.jpg', image)
 
 
 	image = cv2.resize(image, (222*SCALE, 225*SCALE)) 
