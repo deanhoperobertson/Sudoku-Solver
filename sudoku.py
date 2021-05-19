@@ -25,13 +25,11 @@ def main():
 
 	image=extract_digit(image,grid[0])
 
-	print(image)
+	image = cv2.resize(image, (222*SCALE, 225*SCALE)) 
+	cv2.imshow("Window", image)
 
-	# image = cv2.resize(image, (222*SCALE, 225*SCALE)) 
-	# cv2.imshow("Window", image)
-
-	# cv2.waitKey(2000)
-	# cv2.destroyAllWindows()
+	cv2.waitKey(2000)
+	cv2.destroyAllWindows()
 
 if __name__ == '__main__':
 	main()

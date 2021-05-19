@@ -97,6 +97,17 @@ def create_grid(image: np.ndarray) -> List:
     return output
 
 
+def find_center(pt1: Any, pt2: Any):
+    '''
+    Calculates the distance between 2 points.
+    '''
+    side_1 = (pt2[0][0] - pt1[0][0])/2
+    side_2 = (pt2[0][1] - pt1[0][1])/2
+
+    center_point = [[side_1, side_2]]
+    return center_point
+
+
 def fetch_digit(image: np.ndarray, squares: List) -> List:
     '''
     Extracts the digits from each cell within the image.
@@ -121,12 +132,13 @@ def extract_digit(image : np.ndarray, square: List):
     Determine if a cell has a number.
     '''
     image_cell = cut_from_rect(image, square)
-    n_white_pix = np.sum(image == 0)
+    # n_white_pix = np.sum(image == 0)
 
-    if int(n_white_pix) > 300:
-        return "NO Number"
-    else:
-        return "Number"
+    # if int(n_white_pix) > 300:
+    #     return "NO Number"
+    # else:
+    #     return "Number"
+    return image_cell
 
 
 
