@@ -87,7 +87,7 @@ def create_grid(image: np.ndarray) -> List:
     one_side = image.shape[0]
     cell = one_side/9
     output = []
-    trim = 2
+    trim = 0
 
     for x in range(9):
         for y in range(9):
@@ -97,27 +97,14 @@ def create_grid(image: np.ndarray) -> List:
     return output
 
 
-def find_center(pt1: Any, pt2: Any):
+def insert_circle(image, center_point):
     '''
-    Calculates the distance between 2 points.
+    Find center of image and insert a red a red circle.
     '''
-    side_1 = (pt2[0][0] - pt1[0][0])/2
-    side_2 = (pt2[0][1] - pt1[0][1])/2
-
-    center_point = [[side_1, side_2]]
-    return center_point
-
-
-def fetch_digit(image: np.ndarray, squares: List) -> List:
-    '''
-    Extracts the digits from each cell within the image.
-
-    image (np.ndarray): procesed image
-    squares (List): list of cell coordinates
-
-    Returns: List of numbers.
-    '''
-    return [extract_digit(image,square) for square in squares]
+    image = cv2.cvtColor(image,cv2.COLOR_GRAY2RGB)
+    side = int(image.shape[0]/2)
+    image = cv2.circle(image, (side,side), radius=5, color=(0,0,255), thickness=-1)
+    return image
 
 
 def cut_from_rect(img, rect):
@@ -129,24 +116,25 @@ def cut_from_rect(img, rect):
 
 def extract_digit(image : np.ndarray, square: List):
     '''
-    Determine if a cell has a number.
+    Cut the image into a individual cell and determine if a cell has a number.
     '''
     image_cell = cut_from_rect(image, square)
-    # n_white_pix = np.sum(image == 0)
 
-    # if int(n_white_pix) > 300:
-    #     return "NO Number"
-    # else:
-    #     return "Number"
-    return image_cell
+    if has_number(image_cell) == True:
+        return insert_circle(image_cell, square)
+    else:
+        return image_cell
 
 
+def has_number(image_cell):
+    '''
+    Detects if the image_cell has a number.
+    '''
+    n_white_pix = np.sum(image_cell == 0)
 
-
-
-
-
-
-
+    if int(n_white_pix) > 300:
+        return True
+    else:
+        return False
 
 

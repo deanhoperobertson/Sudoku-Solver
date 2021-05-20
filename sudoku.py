@@ -7,7 +7,8 @@ from preprocess import (
 	find_corners,
 	wrap_crop_image,
 	create_grid,
-	extract_digit)
+	extract_digit,
+	insert_circle)
 
 SCALE =2
 PATH = os.getcwd()+"/Images/Easy.jpg"
@@ -24,6 +25,8 @@ def main():
 	grid = create_grid(image)
 
 	image=extract_digit(image,grid[0])
+
+	# image = insert_circle(image, grid[0])
 
 	image = cv2.resize(image, (222*SCALE, 225*SCALE)) 
 	cv2.imshow("Window", image)
