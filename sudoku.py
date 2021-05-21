@@ -4,9 +4,7 @@ import cv2
 import numpy as np
 from preprocess import (
 	pre_process_image,
-	find_corners,
 	wrap_crop_image,
-	create_grid,
 	show_empty_cells)
 
 SCALE =2
@@ -18,11 +16,9 @@ def main():
 	'''
 	image = cv2.imread(PATH, cv2.IMREAD_GRAYSCALE)
 	image = pre_process_image(image)
-	corners = find_corners(image)
-	image = wrap_crop_image(image,corners)
+	image = wrap_crop_image(image)
 
-	grid = create_grid(image)
-	image = show_empty_cells(image,grid)
+	image = show_empty_cells(image)
 
 	# cv2.imwrite('empty_cells.jpg',image)
 

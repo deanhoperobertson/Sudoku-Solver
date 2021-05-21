@@ -39,7 +39,7 @@ def find_corners(image: np.ndarray) -> np.ndarray:
     t2 = [i[0][0] - i[0][1] for i in polygon]
     top_right, bottom_left = t2.index(max(t2)), t2.index(min(t2))
 
-    return [polygon[top_left], polygon[top_right], polygon[bottom_left], polygon[bottom_right]]
+    return polygon[top_left], polygon[top_right], polygon[bottom_left], polygon[bottom_right]
 
 
 def get_distance(pt1: List[int], pt2: List[int]) -> float:
@@ -51,11 +51,11 @@ def get_distance(pt1: List[int], pt2: List[int]) -> float:
     return math.sqrt(side_1**2 + side_2**2)
 
 
-def wrap_crop_image(image: np.ndarray, corners: List) -> np.ndarray:
+def wrap_crop_image(image: np.ndarray) -> np.ndarray:
     '''
     Wrap and crop the image to create a birds eye of the puzzle and cut out any space around the grid.
     '''
-    top_left, top_right, bottom_left, bottom_right = corners[0], corners[1], corners[2], corners[3]
+    top_left, top_right, bottom_left, bottom_right = find_corners(image)
 
     src = np.array([top_left, top_right, bottom_right, bottom_left], dtype='float32')
 
@@ -129,10 +129,12 @@ def find_center(square: List[int]) -> Tuple[int]:
     return (x,y)
 
 
-def show_empty_cells(image: np.ndarray, squares: List[List[int]]) -> np.ndarray:
+def show_empty_cells(image: np.ndarray) -> np.ndarray:
     ''''
     Populaates the empty grid cells with a red dot.
     '''
+    squares = create_grid(image)
+       
     no_numbers = []
 
     for square in squares:
