@@ -2,7 +2,7 @@
 import cv2
 import numpy as np
 import math
-from typing import Any, List
+from typing import Any, List, Tuple
 
 
 def pre_process_image(image: np.ndarray) -> np.ndarray:
@@ -25,7 +25,7 @@ def pre_process_image(image: np.ndarray) -> np.ndarray:
 
 def find_corners(image: np.ndarray) -> np.ndarray:
     '''
-    Find the 4 corners of the square grid.
+    Find the 4 corners of the biggest square in the image.
     '''
     contours, h = cv2.findContours(image.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -42,9 +42,9 @@ def find_corners(image: np.ndarray) -> np.ndarray:
     return [polygon[top_left], polygon[top_right], polygon[bottom_left], polygon[bottom_right]]
 
 
-def get_distance(pt1: Any, pt2: Any):
+def get_distance(pt1: List[int], pt2: List[int]) -> float:
     '''
-    Calculates the distance between 2 points.
+    Calculates the distance between 2 coordinates.
     '''
     side_1 = pt2[0][0] - pt1[0][0]
     side_2 = pt2[0][1] - pt1[0][1]
@@ -73,7 +73,7 @@ def wrap_crop_image(image: np.ndarray, corners: List) -> np.ndarray:
     return cv2.warpPerspective(image, m, (int(max_side), int(max_side)))
 
 
-def create_grid(image: np.ndarray) -> List:
+def create_grid(image: np.ndarray) -> List[int]:
     '''
     Find the coordinates of all 81 cells that make up the grid.
     
@@ -87,7 +87,7 @@ def create_grid(image: np.ndarray) -> List:
     one_side = image.shape[0]
     cell = one_side/9
     output = []
-    trim = 0
+    trim = 2
 
     for x in range(9):
         for y in range(9):
@@ -97,44 +97,56 @@ def create_grid(image: np.ndarray) -> List:
     return output
 
 
-def insert_circle(image, center_point):
-    '''
-    Find center of image and insert a red a red circle.
-    '''
-    image = cv2.cvtColor(image,cv2.COLOR_GRAY2RGB)
-    side = int(image.shape[0]/2)
-    image = cv2.circle(image, (side,side), radius=5, color=(0,0,255), thickness=-1)
-    return image
-
-
-def cut_from_rect(img, rect):
+def cut_from_rect(img: np.ndarray, rect: List[int]) -> np.ndarray:
     '''
     Cuts the image using the top left and bottom right points.
     '''
     return img[int(rect[0][1]):int(rect[1][1]), int(rect[0][0]):int(rect[1][0])]
 
 
-def extract_digit(image : np.ndarray, square: List):
-    '''
-    Cut the image into a individual cell and determine if a cell has a number.
-    '''
-    image_cell = cut_from_rect(image, square)
-
-    if has_number(image_cell) == True:
-        return insert_circle(image_cell, square)
-    else:
-        return image_cell
-
-
-def has_number(image_cell):
+def has_number(image_cell: np.ndarray) -> bool:
     '''
     Detects if the image_cell has a number.
     '''
-    n_white_pix = np.sum(image_cell == 0)
+    n_black_pix = np.sum(image_cell == 0)
 
-    if int(n_white_pix) > 300:
-        return True
-    else:
+    if int(n_black_pix) > 290:
         return False
+    else:
+        return True
+
+
+def find_center(square: List[int]) -> Tuple[int]:
+    '''
+    Find the global coordinates of the centre of the cell.
+    '''
+    pt1 = square[0]
+    pt2 = square[1]
+
+    x = round(pt1[0]+((pt2[0]-pt1[0])/2))
+    y = round(pt1[1]+((pt2[1]-pt1[1])/2))
+
+    return (x,y)
+
+
+def show_empty_cells(image: np.ndarray, squares: List[List[int]]) -> np.ndarray:
+    ''''
+    Populaates the empty grid cells with a red dot.
+    '''
+    no_numbers = []
+
+    for square in squares:
+        image_cell = cut_from_rect(image, square)
+
+        if has_number(image_cell) == False:
+            no_numbers.append(square)
+
+    #convert image back to colour
+    image = cv2.cvtColor(image,cv2.COLOR_GRAY2RGB)
+
+    for cell in no_numbers:
+        center = find_center(cell)
+        image = cv2.circle(image, center, radius=5, color=(0,0,255), thickness=-1)
+    return image
 
 

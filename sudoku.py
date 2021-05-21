@@ -7,8 +7,7 @@ from preprocess import (
 	find_corners,
 	wrap_crop_image,
 	create_grid,
-	extract_digit,
-	insert_circle)
+	show_empty_cells)
 
 SCALE =2
 PATH = os.getcwd()+"/Images/Easy.jpg"
@@ -23,15 +22,14 @@ def main():
 	image = wrap_crop_image(image,corners)
 
 	grid = create_grid(image)
+	image = show_empty_cells(image,grid)
 
-	image=extract_digit(image,grid[0])
-
-	# image = insert_circle(image, grid[0])
+	# cv2.imwrite('empty_cells.jpg',image)
 
 	image = cv2.resize(image, (222*SCALE, 225*SCALE)) 
 	cv2.imshow("Window", image)
 
-	cv2.waitKey(2000)
+	cv2.waitKey(3000)
 	cv2.destroyAllWindows()
 
 if __name__ == '__main__':
