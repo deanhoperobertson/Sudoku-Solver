@@ -87,12 +87,11 @@ def create_grid(image: np.ndarray) -> List[int]:
     one_side = image.shape[0]
     cell = one_side/9
     output = []
-    trim = 2
 
     for x in range(9):
         for y in range(9):
-            pt1 = [(x*cell)+trim,(y*cell)+trim]
-            pt2 = [((x+1)*cell)-trim,((y+1)*cell)-trim]
+            pt1 = [(x*cell),(y*cell)]
+            pt2 = [((x+1)*cell),((y+1)*cell)]
             output.append([pt1,pt2])
     return output
 
@@ -106,8 +105,13 @@ def cut_from_rect(img: np.ndarray, rect: List[int]) -> np.ndarray:
 
 def has_number(image_cell: np.ndarray) -> bool:
     '''
-    Detects if the image_cell has a number.
+    Trim borders of image and detect presence of number.
     '''
+    one_side=image_cell.shape[0]
+    trim = 2
+    image_cell = cut_from_rect(image_cell,[[trim, trim], [one_side-trim, one_side-trim]])
+
+    #count number of black pixels
     n_black_pix = np.sum(image_cell == 0)
 
     if int(n_black_pix) > 290:
@@ -134,7 +138,7 @@ def show_empty_cells(image: np.ndarray) -> np.ndarray:
     Populaates the empty grid cells with a red dot.
     '''
     squares = create_grid(image)
-       
+
     no_numbers = []
 
     for square in squares:
@@ -150,5 +154,60 @@ def show_empty_cells(image: np.ndarray) -> np.ndarray:
         center = find_center(cell)
         image = cv2.circle(image, center, radius=5, color=(0,0,255), thickness=-1)
     return image
+
+
+def clean_number_cell(image,grid):
+    '''
+    Prepares the image cell with numbers for digit recogntion.
+    - remove background
+    - lift digit off backdrop
+    - invert grey scale
+    - background all white pixels
+    '''
+
+    image = cut_from_rect(image,grid)
+
+    height, width = image.shape[:2]
+    one_side=image.shape[0]
+
+    max_area = 0
+    seed_point = (None, None)
+    trim = 3
+
+    #loop through zoomed in centre of image to finde the main feature
+    #colour the main feature with grey
+    for x in range(0+trim, width-trim):
+        for y in range(0+trim, height-trim):
+            # Only operate on light or white squares
+            if image.item(y, x) >= 130 :
+                area = cv2.floodFill(image, None, (x, y), 64)
+                if area[0] > max_area:  # Gets the maximum bound area which should be the grid
+                    max_area = area[0]
+                    seed_point = (x, y)
+
+
+    #Anyting lighter then grey is filled with black pixels
+    for x in range(0, width):
+        for y in range(0, height):
+            if image.item(y, x) >= 100:
+                cv2.floodFill(image, None, (x, y), 0)
+
+    #create mask
+    mask = np.zeros((image.shape[0]+2, image.shape[1]+2), np.uint8)
+
+
+    # Highlight the main feature and fill with white pixels
+    if all([p is not None for p in seed_point]):
+        cv2.floodFill(image, mask, seed_point, 255)
+
+    #black out every pixel darker than white (ie. not the main feature)
+    for x in range(0, width):
+        for y in range(0, height):
+            if image.item(y, x) <= 250: 
+                cv2.floodFill(image, mask, (x, y), 0)
+
+    #invert black and white
+    image = cv2.bitwise_not(image, image)
+    return  image
 
 

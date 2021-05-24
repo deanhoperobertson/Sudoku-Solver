@@ -5,7 +5,9 @@ import numpy as np
 from preprocess import (
 	pre_process_image,
 	wrap_crop_image,
-	show_empty_cells)
+	show_empty_cells,
+	clean_number_cell,
+	create_grid)
 
 SCALE =2
 PATH = os.getcwd()+"/Images/Easy.jpg"
@@ -18,10 +20,12 @@ def main():
 	image = pre_process_image(image)
 	image = wrap_crop_image(image)
 
-	image = show_empty_cells(image)
+	grid = create_grid(image)
 
+	image = clean_number_cell(image,grid[1])
+
+	# image = show_empty_cells(image)
 	# cv2.imwrite('empty_cells.jpg',image)
-
 	image = cv2.resize(image, (222*SCALE, 225*SCALE)) 
 	cv2.imshow("Window", image)
 
