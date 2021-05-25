@@ -156,7 +156,29 @@ def show_empty_cells(image: np.ndarray) -> np.ndarray:
     return image
 
 
-def clean_number_cell(image,grid):
+def find_bounding_box(image: np.ndarray) -> np.ndarray:
+    '''
+    Find the bounding box around the digit in cell.
+    '''
+    height, width = image.shape[:2]
+    top, bottom, left, right = height, 0, width, 0
+
+    for x in range(width):
+        for y in range(height):
+            if image.item(y, x) >=250:
+                top = y if y < top else top
+                bottom = y if y > bottom else bottom
+                left = x if x < left else left
+                right = x if x > right else right
+
+    pad = 3
+    box = [[left-pad, top-pad], [right+pad, bottom+pad]]
+    image = cut_from_rect(image,box)
+
+    return image
+
+
+def clean_number_cell(image: np.ndarray, grid) -> np.ndarray:
     '''
     Prepares the image cell with numbers for digit recogntion.
     - remove background
@@ -205,34 +227,17 @@ def clean_number_cell(image,grid):
             if image.item(y, x) <= 250: 
                 cv2.floodFill(image, mask, (x, y), 0)
 
-    #invert black and white
-    image = cv2.bitwise_not(image, image)
+    #find boudning box and pad scale image
+    image = find_bounding_box(image)
     return  image
 
 
-def find_bounding_box(image):
+def clean_image(image: np.ndarray) -> np.ndarray:
     '''
-    Find the bounding box around the digit in cell.
     '''
-    height, width = image.shape[:2]
-    top, bottom, left, right = height, 0, width, 0
-
-    for x in range(width):
-        for y in range(height):
-            if image.item(y, x) == 0:
-                top = y if y < top else top
-                bottom = y if y > bottom else bottom
-                left = x if x < left else left
-                right = x if x > right else right
-
-    pad = 3
-    box = [[left-pad, top-pad], [right+pad, bottom+pad]]
-
-    image = cut_from_rect(image,box)
-
+    #preprocess
+    image = pre_process_image(image)
+    #crop
+    image = wrap_crop_image(image)
     return image
-
-
-
-
 
