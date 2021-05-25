@@ -1,4 +1,5 @@
 #apply cnn model to extract digits.
+import cv2
 from keras.models import model_from_json
 
 
@@ -12,3 +13,9 @@ loaded_model.load_weights("models/model.h5")
 print("Loaded saved model from disk.")
 
 
+def identify_number(image):
+    image_resize = cv2.resize(image, (28,28))
+    image_resize_2 = image_resize.reshape(1,1,28,28).astype('float32')
+    loaded_model_pred = loaded_model.predict_classes(image_resize_2 , verbose = 0)
+
+    return loaded_model_pred[0]

@@ -7,7 +7,10 @@ from preprocess import (
 	wrap_crop_image,
 	show_empty_cells,
 	clean_number_cell,
-	create_grid)
+	create_grid,
+	find_bounding_box)
+
+from extractor import identify_number
 
 SCALE =2
 PATH = os.getcwd()+"/Images/Easy.jpg"
@@ -22,10 +25,15 @@ def main():
 
 	grid = create_grid(image)
 
-	image = clean_number_cell(image,grid[1])
+	image = clean_number_cell(image,grid[3])
 
-	# image = show_empty_cells(image)
-	# cv2.imwrite('empty_cells.jpg',image)
+	image = find_bounding_box(image)
+
+	number = identify_number(image)
+	print(number)
+
+	#image = show_empty_cells(image)
+	#cv2.imwrite('empty_cells.jpg',image)
 	image = cv2.resize(image, (222*SCALE, 225*SCALE)) 
 	cv2.imshow("Window", image)
 

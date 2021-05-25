@@ -168,7 +168,6 @@ def clean_number_cell(image,grid):
     image = cut_from_rect(image,grid)
 
     height, width = image.shape[:2]
-    one_side=image.shape[0]
 
     max_area = 0
     seed_point = (None, None)
@@ -209,5 +208,31 @@ def clean_number_cell(image,grid):
     #invert black and white
     image = cv2.bitwise_not(image, image)
     return  image
+
+
+def find_bounding_box(image):
+    '''
+    Find the bounding box around the digit in cell.
+    '''
+    height, width = image.shape[:2]
+    top, bottom, left, right = height, 0, width, 0
+
+    for x in range(width):
+        for y in range(height):
+            if image.item(y, x) == 0:
+                top = y if y < top else top
+                bottom = y if y > bottom else bottom
+                left = x if x < left else left
+                right = x if x > right else right
+
+    pad = 3
+    box = [[left-pad, top-pad], [right+pad, bottom+pad]]
+
+    image = cut_from_rect(image,box)
+
+    return image
+
+
+
 
 
