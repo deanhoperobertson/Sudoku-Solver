@@ -29,27 +29,30 @@ def identify_number(image: np.ndarray) -> int:
 
     return loaded_model_pred[0]
 
-# def extract_sudoku(image: np.ndarray):
-#     '''
-#     '''
-#     grid = create_grid(image)
-#     numbers = []
+def extract_sudoku(image: np.ndarray):
+    '''
+    '''
+    image = image.copy()
+    grid = create_grid(image)
+    numbers = []
+    count = 0
 
-#     for square in grid:
-#         image_cell = cut_from_rect(image, square)
+    for square in grid:
+        print(count)
+        image_cell = cut_from_rect(image, square)
 
-#         if has_number(image_cell) == False:
-#             numbers.append("NO")
-#         else:
-#             clean_image = clean_number_cell(image_cell)
-#             digit = identify_number(clean_image)
-#             numbers.append(digit)
+        if has_number(image_cell) == False:
+            numbers.append("NO")
+        else:
+            clean_image = clean_number_cell(image_cell)
+            clean_image = cv2.resize(clean_image, (222*1, 225*1)) 
+            cv2.imshow("Window", clean_image)
+            cv2.waitKey(3000)
+            cv2.destroyAllWindows()
 
+            digit = identify_number(clean_image)
+            numbers.append(digit)
+        count = count + 1
 
-#     return numbers
-
-
-
-
-
+    return numbers
 

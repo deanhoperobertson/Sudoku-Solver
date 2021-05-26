@@ -10,11 +10,18 @@ from keras.layers import Dense, Dropout, Flatten
 from sklearn.metrics import confusion_matrix
 
 
-EPOCHS = 5x
-BATCH = 500
+EPOCHS = 5
+BATCH = 128
 
 #load MNIST dataset from keras
 (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
+
+def remove(digit, x , y):
+	idx = (y != digit).nonzero()
+	return x[idx], y[idx]
+
+X_train, Y_train = remove(0, X_train, Y_train)
+X_test, Y_test = remove(0, X_test, Y_test)
 
 #cast type
 X_train = X_train.reshape(X_train.shape[0], 1,28, 28).astype('float32')
@@ -31,6 +38,7 @@ y_train = np_utils.to_categorical(Y_train)
 y_test = np_utils.to_categorical(Y_test)
 
 #Build neural network architecture
+#--------MODEL 1 ---------------
 model = Sequential()
 model.add(Conv2D(10, (5, 5), input_shape=(1, 28, 28), activation='relu', data_format='channels_first'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -38,6 +46,19 @@ model.add(Dropout(0.2))
 model.add(Flatten())
 model.add(Dense(128, activation='relu'))
 model.add(Dense(10, activation='softmax'))
+
+#--------MODEL 2 ---------------
+# model = Sequential()
+# model.add(Conv2D(30, (5, 5), input_shape=(1, 28, 28), activation='relu', data_format='channels_first'))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+# model.add(Conv2D(15, (3, 3), activation='relu')) ## second convolutiuonal layer
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+# model.add(Dropout(0.2))
+# model.add(Flatten())
+# model.add(Dense(128, activation='relu'))
+# model.add(Dense(50, activation='relu'))
+# model.add(Dropout(0.1))
+# model.add(Dense(10, activation='softmax'))
 
 #compile model
 model.compile(loss='categorical_crossentropy', 

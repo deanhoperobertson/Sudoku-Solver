@@ -67,7 +67,7 @@ def wrap_crop_image(image: np.ndarray) -> np.ndarray:
         ])
 
     #crate a new rectangle which starts in the top left pixel with equal length of max sides
-    rect = np.array([[0, 0], [max_side - 1, 0], [max_side - 1, max_side - 1], [0, max_side - 1]], dtype='float32')
+    rect = np.array([[0, 0], [max_side-1 , 0], [max_side-1, max_side-1], [0, max_side-1]], dtype='float32')
 
     m = cv2.getPerspectiveTransform(src,rect)
     return cv2.warpPerspective(image, m, (int(max_side), int(max_side)))
@@ -82,25 +82,30 @@ def create_grid(image: np.ndarray) -> List[int]:
     |        |
     |        |
     |-------pt2
-
     '''
     one_side = image.shape[0]
-    cell = one_side/9
+    cell = (one_side)/9
     output = []
+    up = 1
+    left = 2
 
     for x in range(9):
         for y in range(9):
-            pt1 = [(x*cell),(y*cell)]
-            pt2 = [((x+1)*cell),((y+1)*cell)]
+            if x > 0 and y >0:
+                pt1 = [(x*cell)-left,(y*cell)-up]
+                pt2 = [((x+1)*cell)-left,((y+1)*cell)-up]
+            else:
+                pt1 = [(x*cell),(y*cell)]
+                pt2 = [((x+1)*cell),((y+1)*cell)]
             output.append([pt1,pt2])
     return output
 
 
-def cut_from_rect(img: np.ndarray, rect: List[int]) -> np.ndarray:
+def cut_from_rect(img: np.ndarray, rect: List[int], trim=0) -> np.ndarray:
     '''
     Cuts the image using the top left and bottom right points.
     '''
-    return img[int(rect[0][1]):int(rect[1][1]), int(rect[0][0]):int(rect[1][0])]
+    return img[int(rect[0][1]+trim):int(rect[1][1]-trim), int(rect[0][0]+trim):int(rect[1][0]-trim)]
 
 
 def has_number(image_cell: np.ndarray) -> bool:
@@ -178,7 +183,7 @@ def find_bounding_box(image: np.ndarray) -> np.ndarray:
     return image
 
 
-def clean_number_cell(image: np.ndarray, grid) -> np.ndarray:
+def clean_number_cell(image: np.ndarray, grid=None, margin=0):#, grid) -> np.ndarray:
     '''
     Prepares the image cell with numbers for digit recogntion.
     - remove background
@@ -187,16 +192,51 @@ def clean_number_cell(image: np.ndarray, grid) -> np.ndarray:
     - background all white pixels
     '''
 
-    image = cut_from_rect(image,grid)
+    if grid:
+        image = cut_from_rect(image,grid, margin)
 
     height, width = image.shape[:2]
 
     max_area = 0
     seed_point = (None, None)
-    trim = 3
+    trim = 2
+    out_trim = 4
 
-    #loop through zoomed in centre of image to finde the main feature
-    #colour the main feature with grey
+    #loop through outside margin and convert light pixeels to black
+    # pt1-------|
+    # |/////////| --> out_trim
+    # |/|-----|/|
+    # |/|     |/|
+    # |/|----- /|
+    # |/////////|
+    # |---------pt2
+
+    for x in range(width):
+        for y in range(height):
+            if ((x > (width-out_trim)) and (image.item(y, x) >= 100)):
+                # cv2.floodFill(image, None, (x, y), 0)
+                image[y,x] = 0
+            if ((x < out_trim) and (image.item(y, x) >= 100)):
+                # cv2.floodFill(image, None, (x, y), 0)
+                image[y,x] = 0
+            if ((y < out_trim) and (image.item(y, x) >= 100)):
+                # cv2.floodFill(image, None, (x, y), 0)
+                image[y,x] = 0
+            if ((y > (height-out_trim)) and (image.item(y, x) >= 100)):
+                # cv2.floodFill(image, None, (x, y), 0)
+                image[y,x] = 0
+
+
+    # loop through inner margint to find the main feature and colour grey
+
+    # pt1-------|
+    # |         | --> out_trim
+    # | |-----| |
+    # | |/////| |
+    # | |-----  |
+    # |         |
+    # |---------pt2
+
     for x in range(0+trim, width-trim):
         for y in range(0+trim, height-trim):
             # Only operate on light or white squares
@@ -207,7 +247,7 @@ def clean_number_cell(image: np.ndarray, grid) -> np.ndarray:
                     seed_point = (x, y)
 
 
-    #Anyting lighter then grey is filled with black pixels
+    #Anything lighter then grey is filled with black pixels
     for x in range(0, width):
         for y in range(0, height):
             if image.item(y, x) >= 100:
@@ -227,7 +267,7 @@ def clean_number_cell(image: np.ndarray, grid) -> np.ndarray:
             if image.item(y, x) <= 250: 
                 cv2.floodFill(image, mask, (x, y), 0)
 
-    #find boudning box and pad scale image
+    # #find boudning box and pad scale image
     image = find_bounding_box(image)
     return  image
 
